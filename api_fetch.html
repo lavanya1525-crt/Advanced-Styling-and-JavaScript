@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Data Fetch Example</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f8ff; /* Alice Blue */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 50px;
+            min-height: 100vh;
+            margin: 0;
+        }
+        #joke-container {
+            background-color: #fff;
+            padding: 25px 35px;
+            border-radius: 8px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+            text-align: center;
+            width: 80%;
+            max-width: 600px;
+            min-height: 100px; /* Reserve space */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        #fetch-button {
+            padding: 12px 25px;
+            font-size: 1.1em;
+            background-color: #5cb85c; /* Success Green */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: background-color 0.3s ease;
+        }
+        #fetch-button:hover {
+            background-color: #4cae4c;
+        }
+        #fetch-button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        #joke-setup {
+            font-size: 1.2em;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        #joke-delivery {
+            font-size: 1.2em;
+            color: #555;
+            font-style: italic;
+            margin-top: 0;
+        }
+         #joke-single {
+            font-size: 1.2em;
+            color: #333;
+             margin: 0;
+        }
+        #status {
+             margin-top: 15px;
+             font-style: italic;
+             color: #777;
+             min-height: 1.2em; /* Reserve space */
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Random Joke Generator</h1>
+
+    <button id="fetch-button">Get a Joke!</button>
+
+    <div id="joke-container">
+        <p id="joke-setup"></p>
+        <p id="joke-delivery"></p>
+        <p id="joke-single"></p>
+         <p id="status">Click the button to fetch a joke.</p>
+    </div>
+
+    <script>
+        const fetchButton = document.getElementById('fetch-button');
+        const jokeSetupElement = document.getElementById('joke-setup');
+        const jokeDeliveryElement = document.getElementById('joke-delivery');
+        const jokeSingleElement = document.getElementById('joke-single');
+        const statusElement = document.getElementById('status');
+
+        // API Endpoint (JokeAPI - Safe mode, avoiding controversial jokes)
+        // Filters: Any category except explicit, safe-mode on
+        const apiUrl = 'https://v2.jokeapi.dev/joke/Any?safe-mode';
+
+        async function fetchJoke() {
+            // Disable button and show loading status
+            fetchButton.disabled = true;
+            statusElement.textContent = 'Fetching joke...';
+            jokeSetupElement.textContent = '';
+            jokeDeliveryElement.textContent = '';
+            jokeSingleElement.textContent = '';
+
+
+            try {
+                const response = await fetch(apiUrl);
+
+                // Check if the request was successful
+                if (!response.ok) {
+                    // Throw an error with the status text if response is not ok
+                    throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
+                }
+
+                const data = await response.json(); // Parse the JSON response
+
+                // Check if the API returned an error flag
+                 if (data.error) {
+                     throw new Error(`API error: ${data.message || 'Unknown API error'}`);
+                 }
+
+                statusElement.textContent = ''; // Clear status message
+
+                // Display the joke based on its type (single or two-part)
+                if (data.type === 'single') {
+                    jokeSingleElement.textContent = data.joke;
+                    jokeSetupElement.textContent = '';
+                    jokeDeliveryElement.textContent = '';
+                } else if (data.type === 'twopart') {
+                    jokeSetupElement.textContent = data.setup;
+                    jokeDeliveryElement.textContent = data.delivery;
+                     jokeSingleElement.textContent = '';
+                } else {
+                     throw new Error('Unknown joke format received.');
+                }
+
+            } catch (error) {
+                console.error("Fetching joke failed:", error);
+                statusElement.textContent = `Failed to load joke. ${error.message}`;
+                 jokeSetupElement.textContent = '';
+                 jokeDeliveryElement.textContent = '';
+                 jokeSingleElement.textContent = '';
+            } finally {
+                 // Re-enable the button regardless of success or failure
+                fetchButton.disabled = false;
+            }
+        }
+
+        // Add event listener to the button
+        fetchButton.addEventListener('click', fetchJoke);
+
+    </script>
+
+</body>
+</html>

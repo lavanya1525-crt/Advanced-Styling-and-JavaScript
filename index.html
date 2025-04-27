@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!-- Crucial viewport meta tag for responsive design -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Responsive Design Example</title>
+
+    <style>
+        /* --- Base Styles (Mobile First - applies to all sizes unless overridden) --- */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 1em; /* Padding around the content on small screens */
+            font-size: 16px; /* Base font size for mobile */
+            background-color: #f4f4f4; /* Light grey background */
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px; /* Max width prevents it getting too wide on large desktops */
+            margin: 0 auto;   /* Center the container horizontally */
+            background-color: #ffffff; /* White background for the content area */
+            padding: 1em;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Subtle shadow */
+        }
+
+        h1 {
+            font-size: 1.8em; /* Heading size for mobile */
+            text-align: center;
+            color: #0056b3;
+            margin-bottom: 1em;
+        }
+
+        .item {
+            background-color: #e9f5ff; /* Light blue background for items */
+            padding: 1.5em;
+            margin-bottom: 1em; /* Stack items vertically with space */
+            border: 1px solid #bce0fd;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        /* Remove margin from the last item in the default flow */
+        .item:last-child {
+            margin-bottom: 0;
+        }
+
+        p {
+           text-align: justify; /* Justify text within paragraphs */
+           margin-bottom: 1em;
+        }
+
+        /* --- Tablet Breakpoint (styles apply when screen width is 768px or more) --- */
+        @media (min-width: 768px) {
+            body {
+                font-size: 17px; /* Slightly larger base font */
+                padding: 1.5em; /* More padding around the body */
+            }
+
+            h1 {
+                font-size: 2.2em; /* Larger heading */
+                text-align: left; /* Align heading left */
+            }
+
+            .container {
+                padding: 1.5em;
+                display: flex; /* Use Flexbox for layout */
+                flex-wrap: wrap; /* Allow items to wrap */
+                gap: 1.5em; /* Space between flex items (replaces margin-bottom) */
+            }
+
+            .item {
+                /* Two columns: calculate width based on 50% minus half the gap */
+                flex-basis: calc(50% - 0.75em);
+                margin-bottom: 0; /* Remove bottom margin as 'gap' handles spacing */
+            }
+
+             /* Ensure the paragraph now has bottom margin again if needed */
+             p {
+                margin-bottom: 1.5em;
+            }
+        }
+
+        /* --- Desktop Breakpoint (styles apply when screen width is 1024px or more) --- */
+        @media (min-width: 1024px) {
+            body {
+                font-size: 18px; /* Even larger base font for desktop */
+                padding: 2em;
+                background-color: #e8e8e8; /* Slightly different background for desktop */
+            }
+
+             h1 {
+                font-size: 2.5em; /* Larger heading */
+            }
+
+            .container {
+                padding: 2em;
+                gap: 2em; /* Increase gap between items */
+            }
+
+            .item {
+                /* Four columns: calculate width based on 25% minus 3/4 of the gap */
+                /* (Total gap width = 3 * 2em = 6em. Divide by 4 items = 1.5em reduction per item) */
+                flex-basis: calc(25% - 1.5em);
+                transition: transform 0.2s ease-in-out; /* Add a subtle hover effect */
+            }
+
+            .item:hover {
+                transform: translateY(-5px); /* Lift item slightly on hover */
+                box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+                cursor: pointer;
+            }
+
+             p {
+                line-height: 1.7; /* Slightly more line spacing */
+            }
+        }
+
+         /* --- Optional: Larger Desktop Breakpoint (e.g., screens 1440px and wider) --- */
+        @media (min-width: 1440px) {
+            /* You could increase container padding, font sizes, or adjust layout further */
+            .container {
+                padding: 2.5em;
+            }
+            /* Maybe keep 4 columns but increase gap? Or refine other elements */
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Responsive Layout Example</h1>
+
+        <p>Resize your browser window to see the layout change. The styles applied depend on the viewport width, following a mobile-first approach.</p>
+
+        <div class="item">Item 1</div>
+        <div class="item">Item 2</div>
+        <div class="item">Item 3</div>
+        <div class="item">Item 4</div>
+        <div class="item">Item 5</div>
+        <div class="item">Item 6</div>
+
+         <p>Below 768px, items stack vertically. Between 768px and 1023px, items arrange into two columns. At 1024px and above, they form four columns (if enough items exist).</p>
+    </div>
+
+</body>
+</html>

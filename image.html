@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Carousel</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f0f0f0;
+        }
+
+        .carousel-container {
+            position: relative; /* Needed for absolute positioning of buttons */
+            width: 90%;
+            max-width: 700px;
+            overflow: hidden; /* Hides parts of images if they overflow */
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            background-color: #333; /* Dark background for contrast */
+        }
+
+        .carousel-slide {
+            display: flex; /* Arrange images horizontally */
+            transition: transform 0.5s ease-in-out; /* Smooth slide animation */
+             /* Width will be set by JS based on number of images */
+        }
+
+        .carousel-slide img {
+            /* Make images take full width of their container part */
+            min-width: 100%;
+            height: auto; /* Maintain aspect ratio */
+            display: block; /* Remove extra space below image */
+            object-fit: cover; /* Cover the area, might crop */
+            max-height: 500px; /* Optional: Limit image height */
+        }
+
+        /* Buttons */
+        .carousel-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 1.5em;
+            cursor: pointer;
+            border-radius: 5px;
+            z-index: 10; /* Ensure buttons are above images */
+            transition: background-color 0.3s;
+        }
+
+        .carousel-btn:hover {
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+
+        #prev-btn {
+            left: 10px;
+        }
+
+        #next-btn {
+            right: 10px;
+        }
+
+         /* Indicator Dots (Optional but nice) */
+        .carousel-dots {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            z-index: 10;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .dot.active {
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="carousel-container">
+        <div class="carousel-slide" id="carousel-slide">
+            <!-- Images will be loaded here by JS -->
+             <!-- Example structure (JS will generate this):
+            <img src="image1.jpg" alt="Image 1">
+            <img src="image2.jpg" alt="Image 2">
+            ... -->
+        </div>
+
+        <button class="carousel-btn" id="prev-btn">❮</button> <!-- Left Arrow -->
+        <button class="carousel-btn" id="next-btn">❯</button> <!-- Right Arrow -->
+
+        <div class="carousel-dots" id="carousel-dots">
+            <!-- Dots will be generated here -->
+        </div>
+    </div>
+
+    <script>
+        // --- Carousel Data (Image URLs) ---
+        // Replace with your actual image paths or URLs
+        const images = [
+            'https://via.placeholder.com/700x400/FF0000/FFFFFF?text=Image+1',
+            'https://via.placeholder.com/700x400/00FF00/FFFFFF?text=Image+2',
+            'https://via.placeholder.com/700x400/0000FF/FFFFFF?text=Image+3',
+            'https://via.placeholder.com/700x400/FFFF00/000000?text=Image+4'
+        ];
+
+        // --- DOM Elements ---
+        const carouselSlide = document.getElementById('carousel-slide');
+        const prevButton = document.getElementById('prev-btn');
+        const nextButton = document.getElementById('next-btn');
+        const dotsContainer = document.getElementById('carousel-dots');
+
+        // --- State Variables ---
+        let currentIndex = 0;
+
+        // --- Functions ---
+
+        // Function to create images and dots, and set initial state
+        function initializeCarousel() {
+            carouselSlide.innerHTML = ''; // Clear existing content
+            dotsContainer.innerHTML = ''; // Clear existing dots
+
+            images.forEach((src, index) => {
+                // Create Image element
+                const img = document.createElement('img');
+                img.src = src;
+                img.alt = `Image ${index + 1}`;
+                carouselSlide.appendChild(img);
+
+                // Create Dot element
+                const dot = document.createElement('span');
+                dot.classList.add('dot');
+                dot.dataset.index = index; // Store index on dot
+                dot.addEventListener('click', () => goToSlide(index));
+                dotsContainer.appendChild(dot);
+            });
+
+             // Set the total width of the slide container
+            carouselSlide.style.width = `${images.length * 100}%`;
+
+            updateCarousel(); // Show the first image and active dot
+        }
+
+
+        // Function to update the carousel display (image and dots)
+        function updateCarousel() {
+            // Calculate the necessary translation
+            const offset = -currentIndex * 100; // Percentage offset
+            carouselSlide.style.transform = `translateX(${offset}%)`;
+
+            // Update active dot
+            const dots = dotsContainer.children;
+            Array.from(dots).forEach((dot, index) => {
+                dot.classList.toggle('active', index === currentIndex);
+            });
+        }
+
+        // Function to go to a specific slide index
+        function goToSlide(index) {
+            currentIndex = index;
+            updateCarousel();
+        }
+
+        // Function to show the next slide
+        function showNextSlide() {
+            currentIndex++;
+            if (currentIndex >= images.length) {
+                currentIndex = 0; // Loop back to the first image
+            }
+            updateCarousel();
+        }
+
+        // Function to show the previous slide
+        function showPrevSlide() {
+            currentIndex--;
+            if (currentIndex < 0) {
+                currentIndex = images.length - 1; // Loop back to the last image
+            }
+            updateCarousel();
+        }
+
+        // --- Event Listeners ---
+        nextButton.addEventListener('click', showNextSlide);
+        prevButton.addEventListener('click', showPrevSlide);
+
+        // --- Initial Call ---
+        if (images.length > 0) {
+            initializeCarousel();
+        } else {
+            // Handle case with no images
+            carouselSlide.textContent = "No images to display.";
+            prevButton.style.display = 'none';
+            nextButton.style.display = 'none';
+            dotsContainer.style.display = 'none';
+        }
+
+    </script>
+
+</body>
+</html>
